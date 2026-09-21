@@ -1,33 +1,70 @@
 ﻿using StackExchange.Redis;
+using System;
 
-ConnectionMultiplexer redis = ConnectionMultiplexer.Connect("localhost:6379");
+// 1. Conexión a Redis
+ConnectionMultiplexer redis = ConnectionMultiplexer.Connect(
+    "100.69.194.69:6379,password=ABC12345_"
+);
+
 IDatabase db = redis.GetDatabase();
 
-// CREAR
-db.HashSet("usuario:1", new HashEntry[]
+
+// ==========================
+// AGREGAR DATOS
+// ==========================
+
+// Nombres
+db.ListRightPush("usuario:1:nombre", "fany");
+db.ListRightPush("usuario:1:nombre", "jesus");
+
+// Edades
+db.ListRightPush("usuario:1:edad", 19);
+db.ListRightPush("usuario:1:edad", 5);
+
+// Carreras
+db.ListRightPush("usuario:1:carrera", "Informatica");
+db.ListRightPush("usuario:1:carrera", "conta");
+
+Console.WriteLine("Datos agregados exitosamente.");
+
+
+// ==========================
+// CONSULTAR NOMBRES
+// ==========================
+
+Console.WriteLine("\nNOMBRES:");
+
+RedisValue[] nombres = db.ListRange("usuario:1:nombre");
+
+foreach (RedisValue nombre in nombres)
 {
-    new HashEntry("nombre", "Axel"),
-    new HashEntry("edad", 20),
-    new HashEntry("carrera", "Programacion")
-});
+    Console.WriteLine("- " + nombre);
+}
 
-Console.WriteLine("Usuario creado");
 
-// CONSULTAR
-string? nombre = db.HashGet("usuario:1", "nombre");
-string? edad = db.HashGet("usuario:1", "edad");
-string? carrera = db.HashGet("usuario:1", "carrera");
+// ==========================
+// CONSULTAR EDADES
+// ==========================
 
-Console.WriteLine("Nombre: " + nombre);
-Console.WriteLine("Edad: " + edad);
-Console.WriteLine("Carrera: " + carrera);
+Console.WriteLine("\nEDADES:");
 
-// ACTUALIZAR
-db.HashSet("usuario:1", "edad", 21);
+RedisValue[] edades = db.ListRange("usuario:1:edad");
 
-Console.WriteLine("Edad actualizada: " + db.HashGet("usuario:1", "edad"));
+foreach (RedisValue edad in edades)
+{
+    Console.WriteLine("- " + edad);
+}
 
-// ELIMINAR
-db.KeyDelete("usuario:1");
 
-Console.WriteLine("Usuario eliminado");
+// ==========================
+// CONSULTAR CARRERAS
+// ==========================
+
+Console.WriteLine("\nCARRERAS:");
+
+RedisValue[] carreras = db.ListRange("usuario:1:carrera");
+
+foreach (RedisValue carrera in carreras)
+{
+    Console.WriteLine("- " + carrera);
+}
